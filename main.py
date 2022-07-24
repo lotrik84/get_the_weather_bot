@@ -8,7 +8,8 @@ import locale
 import emoji
 import weatherAPI
 
-load_dotenv()
+load_dotenv("./config/.env")
+os.environ['TZ'] = 'Europe/Kiev'
 
 API_KEY = os.getenv('API_KEY')
 bot = telebot.TeleBot(API_KEY)
@@ -54,7 +55,6 @@ def today_weather(message):
     response = get_weather_api.get_weather(message.text)
 
     if response:
-        # print(response["hourly"])
         temp = {}
         humidity = {}
         wind_speed = {}

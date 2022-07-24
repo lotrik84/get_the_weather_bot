@@ -1,5 +1,5 @@
 venv
 get_the_weather_bot
-.env
 .idea
 __pycache__
+config
