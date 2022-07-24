@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import requests
 
-load_dotenv()
+load_dotenv("./config/.env")
 
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 api = "https://api.openweathermap.org/data/2.5"

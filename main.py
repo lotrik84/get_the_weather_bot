@@ -8,7 +8,7 @@ import locale
 import emoji
 import weatherAPI
 
-load_dotenv()
+load_dotenv("./config/.env")
 
 API_KEY = os.getenv('API_KEY')
 bot = telebot.TeleBot(API_KEY)
