@@ -9,6 +9,7 @@ import emoji
 import weatherAPI
 
 load_dotenv("./config/.env")
+os.environ['TZ'] = 'Europe/Kiev'
 
 API_KEY = os.getenv('API_KEY')
 bot = telebot.TeleBot(API_KEY)
