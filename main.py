@@ -54,7 +54,6 @@ def today_weather(message):
     response = get_weather_api.get_weather(message.text)
 
     if response:
-        # print(response["hourly"])
         temp = {}
         humidity = {}
         wind_speed = {}
