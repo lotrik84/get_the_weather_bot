@@ -52,5 +52,5 @@ jobs:
           script: |
             cd /opt/microservices/get_the_weather_bot
             cp docker-compose_template.yml docker-compose.yml
-            sed -i "s/tag/${{ env.RELEASE_VERSION }}/g" docker-compose.yml
+            sed -i 's/tag/${{ env.RELEASE_VERSION }}/g' docker-compose.yml
             docker-compose up -d
