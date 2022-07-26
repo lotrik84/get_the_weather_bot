@@ -18,7 +18,7 @@ start = types.BotCommand("start", "Головна")
 m_c_weather = types.BotCommand("weather", "Поточна погода")
 m_1d_weather = types.BotCommand("todayweather", "Погода на сьогодні")
 m_3d_weather = types.BotCommand("3daysweather", "Погода на 3 дні")
-m_7d_weather = types.BotCommand("7daysweather", "Погода на тиждень")
+m_7d_weather = types.BotCommand("weekweather", "Погода на тиждень")
 bot.set_my_commands(commands=[start, m_c_weather, m_1d_weather, m_3d_weather, m_7d_weather], )
 get_weather_api = weatherAPI
 weather_hours = ["03", "06", "09", "12", "15", "18", "21"]
@@ -99,20 +99,24 @@ def couple_days_weather(message, c_days):
         weather_emoji = {}
         description = {}
         days = []
-        msg = f'Погода на найближчі {c_days + 1} дня(ів) у місті {message.text.title()}:\n'
-        end = int(date.today().strftime("%d")) + c_days
+        if c_days == 3:
+            msg = f'Погода на найближчі 3 дні у місті {message.text.title()}:\n'
+        else:
+            msg = f'Погода на тиждень у місті {message.text.title()}:\n'
 
         for day in response["daily"]:
             c_day = datetime.fromtimestamp(day["dt"]).strftime("%d %B, %A")
-            if end >= int(datetime.fromtimestamp(day["dt"]).strftime("%d")):
-                days.append(c_day)
-                temp_day[c_day] = round(day["temp"]["day"])
-                temp_night[c_day] = round(day["temp"]["night"])
-                humidity[c_day] = round(day["humidity"])
-                wind_speed[c_day] = round(day["wind_speed"])
-                pressure[c_day] = round(day["pressure"] * 0.75006)
-                description[c_day] = day["weather"][0]["description"]
-                weather_emoji[c_day] = get_emoji.getemoji(day["weather"][0]["id"])
+            days.append(c_day)
+            temp_day[c_day] = round(day["temp"]["day"])
+            temp_night[c_day] = round(day["temp"]["night"])
+            humidity[c_day] = round(day["humidity"])
+            wind_speed[c_day] = round(day["wind_speed"])
+            pressure[c_day] = round(day["pressure"] * 0.75006)
+            description[c_day] = day["weather"][0]["description"]
+            weather_emoji[c_day] = get_emoji.getemoji(day["weather"][0]["id"])
+
+            if c_days == 3 and len(days) == 3:
+                break
 
         for day in days:
             msg += f'\n{day.title()} {weather_emoji[day]} {description[day].capitalize()}\nТемпература вдень: ' \
@@ -149,12 +153,12 @@ def weather(message):
           f'{datetime.today().strftime("%Y-%m-%d %H:%M")}')
 
     msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
-    bot.register_next_step_handler(msg, couple_days_weather, 2)
+    bot.register_next_step_handler(msg, couple_days_weather, 3)
 
 
-@bot.message_handler(commands=['7daysweather'])
+@bot.message_handler(commands=['weekweather'])
 def weather(message):
-    print(f'7daysweather - {message.from_user.first_name} @{message.from_user.username} '
+    print(f'weekweather - {message.from_user.first_name} @{message.from_user.username} '
           f'{datetime.today().strftime("%Y-%m-%d %H:%M")}')
 
     msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
