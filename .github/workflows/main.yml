@@ -32,6 +32,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
