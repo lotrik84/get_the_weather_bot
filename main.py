@@ -7,11 +7,12 @@ from datetime import datetime
 import locale
 import emoji
 import weatherAPI
+from weather_logs import weather_logs
 
 load_dotenv("./config/.env")
 os.environ['TZ'] = 'Europe/Kiev'
 
-API_KEY = os.getenv('API_KEY')
+API_KEY = os.getenv('API_KEY_TEST')
 bot = telebot.TeleBot(API_KEY)
 get_emoji = emoji
 start = types.BotCommand("start", "Головна")
@@ -26,7 +27,7 @@ weather_hours = ["03", "06", "09", "12", "15", "18", "21"]
 
 @bot.message_handler(commands=['start'])
 def greet(message):
-    bot.send_message(message.chat.id, f'Привіт, {message.from_user.first_name}, я бот погоди. Можешь скористатися меню'
+    bot.send_message(message.chat.id, f'Привіт, {message.from_user.first_name}, я бот погоди. Можеш скористатися меню'
                                       f' для отримання погоди у твоєму місті.', )
 
 
@@ -131,8 +132,12 @@ def couple_days_weather(message, c_days):
 
 @bot.message_handler(commands=['weather'])
 def weather(message):
-    print(f'weather - {message.from_user.first_name} @{message.from_user.username} '
-          f'{datetime.today().strftime("%Y-%m-%d %H:%M")}')
+    # print(f'weather - {message.from_user.first_name} @{message.from_user.username} '
+    #       f'{datetime.today().strftime("%Y-%m-%d %H:%M")}')
+    msg_logs = f'weather - {message.from_user.first_name} @{message.from_user.username}\n'
+    msg_date = datetime.today().strftime("%Y-%m-%d")
+
+    weather_logs(msg_logs, msg_date)
 
     msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
     bot.register_next_step_handler(msg, current_weather)
@@ -140,8 +145,10 @@ def weather(message):
 
 @bot.message_handler(commands=['todayweather'])
 def weather(message):
-    print(f'todayweather - {message.from_user.first_name} @{message.from_user.username} '
-          f'{datetime.today().strftime("%Y-%m-%d %H:%M")}')
+    msg_logs = f'todayweather - {message.from_user.first_name} @{message.from_user.username}\n'
+    msg_date = datetime.today().strftime("%Y-%m-%d")
+
+    weather_logs(msg_logs, msg_date)
 
     msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
     bot.register_next_step_handler(msg, today_weather)
@@ -149,8 +156,10 @@ def weather(message):
 
 @bot.message_handler(commands=['3daysweather'])
 def weather(message):
-    print(f'3daysweather - {message.from_user.first_name} @{message.from_user.username} '
-          f'{datetime.today().strftime("%Y-%m-%d %H:%M")}')
+    msg_logs = f'3daysweather - {message.from_user.first_name} @{message.from_user.username}\n'
+    msg_date = datetime.today().strftime("%Y-%m-%d")
+
+    weather_logs(msg_logs, msg_date)
 
     msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
     bot.register_next_step_handler(msg, couple_days_weather, 3)
@@ -158,8 +167,10 @@ def weather(message):
 
 @bot.message_handler(commands=['weekweather'])
 def weather(message):
-    print(f'weekweather - {message.from_user.first_name} @{message.from_user.username} '
-          f'{datetime.today().strftime("%Y-%m-%d %H:%M")}')
+    msg_logs = f'weekweather - {message.from_user.first_name} @{message.from_user.username}\n'
+    msg_date = datetime.today().strftime("%Y-%m-%d")
+
+    weather_logs(msg_logs, msg_date)
 
     msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
     bot.register_next_step_handler(msg, couple_days_weather, 7)
