@@ -12,7 +12,7 @@ from weather_logs import weather_logs
 load_dotenv("./config/.env")
 os.environ['TZ'] = 'Europe/Kiev'
 
-API_KEY = os.getenv('API_KEY')
+API_KEY = os.getenv('API_KEY_TEST')
 bot = telebot.TeleBot(API_KEY)
 get_emoji = emoji
 start = types.BotCommand("start", "Головна")
@@ -134,8 +134,8 @@ def couple_days_weather(message, c_days):
 def weather(message):
     # print(f'weather - {message.from_user.first_name} @{message.from_user.username} '
     #       f'{datetime.today().strftime("%Y-%m-%d %H:%M")}')
-    msg_logs = f'weather - {message.from_user.first_name} @{message.from_user.username} ' \
-               f'{datetime.today().strftime("%Y-%m-%d %H:%M")}\n'
+    msg_logs = f'{datetime.today().strftime("%Y-%m-%d %H:%M")} ' \
+               f'weather - {message.from_user.first_name} @{message.from_user.username}\n'
     msg_date = datetime.today().strftime("%Y-%m-%d")
 
     weather_logs(msg_logs, msg_date)
@@ -146,8 +146,8 @@ def weather(message):
 
 @bot.message_handler(commands=['todayweather'])
 def weather(message):
-    msg_logs = f'weather - {message.from_user.first_name} @{message.from_user.username} ' \
-               f'{datetime.today().strftime("%Y-%m-%d %H:%M")}\n'
+    msg_logs = f'{datetime.today().strftime("%Y-%m-%d %H:%M")} ' \
+               f'todayweather - {message.from_user.first_name} @{message.from_user.username}\n'
     msg_date = datetime.today().strftime("%Y-%m-%d")
 
     weather_logs(msg_logs, msg_date)
@@ -158,8 +158,8 @@ def weather(message):
 
 @bot.message_handler(commands=['3daysweather'])
 def weather(message):
-    msg_logs = f'weather - {message.from_user.first_name} @{message.from_user.username} ' \
-               f'{datetime.today().strftime("%Y-%m-%d %H:%M")}\n'
+    msg_logs = f'{datetime.today().strftime("%Y-%m-%d %H:%M")} ' \
+               f'3daysweather - {message.from_user.first_name} @{message.from_user.username}\n'
     msg_date = datetime.today().strftime("%Y-%m-%d")
 
     weather_logs(msg_logs, msg_date)
@@ -170,8 +170,8 @@ def weather(message):
 
 @bot.message_handler(commands=['weekweather'])
 def weather(message):
-    msg_logs = f'weather - {message.from_user.first_name} @{message.from_user.username} ' \
-               f'{datetime.today().strftime("%Y-%m-%d %H:%M")}\n'
+    msg_logs = f'{datetime.today().strftime("%Y-%m-%d %H:%M")} ' \
+               f'weekweather - {message.from_user.first_name} @{message.from_user.username}\n'
     msg_date = datetime.today().strftime("%Y-%m-%d")
 
     weather_logs(msg_logs, msg_date)
