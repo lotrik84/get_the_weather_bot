@@ -8,6 +8,7 @@ import locale
 import emoji
 import weatherAPI
 from weather_logs import weather_logs
+from usersCities import get_user_cities, update_user_cities
 
 load_dotenv("./config/.env")
 os.environ['TZ'] = 'Europe/Kiev'
@@ -35,6 +36,7 @@ def current_weather(message):
     # bot.delete_message(call.message.chat.id, call.message.id)
     locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
     response = get_weather_api.get_weather(message.text)
+    markup = telebot.types.ReplyKeyboardRemove()
     if response:
         # print(response)
         temp = round(response["current"]["temp"])
@@ -45,16 +47,17 @@ def current_weather(message):
         description = response["current"]["weather"][0]["description"]
         time_stamp = datetime.fromtimestamp(response["current"]["dt"]).strftime("%H:%M")
         bot.send_message(message.chat.id, f'Поточна погода у місті {message.text.title()}:\n\n{time_stamp} {weather_emoji} '
-                                          f'{description.capitalize()}\nТемпература: {temp}°C\nВологість: {humidity}%'
-                                          f'\nТиск: {pressure} mm\nВітер: {wind_speed} м/с')
+                                  f'{description.capitalize()}\nТемпература: {temp}°C\nВологість: {humidity}%'
+                                  f'\nТиск: {pressure} mm\nВітер: {wind_speed} м/с', reply_markup=markup)
+        update_user_cities(message.from_user.username, message.text)
     else:
-        bot.send_message(message.chat.id, f'Місто "{message.text}" не знайдено')
+        bot.send_message(message.chat.id, f'Місто "{message.text}" не знайдено', reply_markup=markup)
 
 
 def today_weather(message):
     locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
     response = get_weather_api.get_weather(message.text)
-
+    markup = telebot.types.ReplyKeyboardRemove()
     if response:
         temp = {}
         humidity = {}
@@ -81,16 +84,17 @@ def today_weather(message):
             msg += f'\n{hour}:00 {weather_emoji[hour]} {description[hour].capitalize()}\nТемпература: {temp[hour]}' \
                    f'°C\nВологість: {humidity[hour]}%\nТиск: {pressure[hour]} mm\nВітер: {wind_speed[hour]} м/с\n'
 
-        bot.send_message(message.chat.id, msg)
+        bot.send_message(message.chat.id, msg, reply_markup=markup)
+        update_user_cities(message.from_user.username, message.text)
 
     else:
-        bot.send_message(message.chat.id, f'Місто "{message.text}" не знайдено')
+        bot.send_message(message.chat.id, f'Місто "{message.text}" не знайдено', reply_markup=markup)
 
 
 def couple_days_weather(message, c_days):
     locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
     response = get_weather_api.get_weather(message.text)
-
+    markup = telebot.types.ReplyKeyboardRemove()
     if response:
         temp_day = {}
         temp_night = {}
@@ -124,10 +128,11 @@ def couple_days_weather(message, c_days):
                    f'{temp_day[day]}°C\nТемпература вночі:  {temp_night[day]}°C\nВологість: {humidity[day]}%\nТиск: ' \
                    f'{pressure[day]} mm\nВітер: {wind_speed[day]} м/с\n'
 
-        bot.send_message(message.chat.id, msg)
+        bot.send_message(message.chat.id, msg, reply_markup=markup)
+        update_user_cities(message.from_user.username, message.text)
 
     else:
-        bot.send_message(message.chat.id, f'Місто "{message.text}" не знайдено')
+        bot.send_message(message.chat.id, f'Місто "{message.text}" не знайдено', reply_markup=markup)
 
 
 @bot.message_handler(commands=['weather'])
@@ -137,11 +142,21 @@ def weather(message):
     msg_logs = f'{datetime.today().strftime("%Y-%m-%d %H:%M")} ' \
                f'weather - {message.from_user.first_name} @{message.from_user.username}\n'
     msg_date = datetime.today().strftime("%Y-%m-%d")
-
     weather_logs(msg_logs, msg_date)
 
-    msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
-    bot.register_next_step_handler(msg, current_weather)
+    user_cities = get_user_cities(message.from_user.username)
+
+    if user_cities is None:
+        msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
+        bot.register_next_step_handler(msg, current_weather)
+    else:
+        cities = user_cities["cities"].split()
+        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        for city in cities:
+            markup.add(city)
+
+        msg = bot.send_message(message.chat.id, f'Оберіть Ваше місто або введіть його назву:', reply_markup=markup)
+        bot.register_next_step_handler(msg, current_weather)
 
 
 @bot.message_handler(commands=['todayweather'])
@@ -152,8 +167,19 @@ def weather(message):
 
     weather_logs(msg_logs, msg_date)
 
-    msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
-    bot.register_next_step_handler(msg, today_weather)
+    user_cities = get_user_cities(message.from_user.username)
+
+    if user_cities is None:
+        msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
+        bot.register_next_step_handler(msg, today_weather)
+    else:
+        cities = user_cities["cities"].split()
+        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        for city in cities:
+            markup.add(city)
+
+        msg = bot.send_message(message.chat.id, f'Оберіть Ваше місто або введіть його назву:', reply_markup=markup)
+        bot.register_next_step_handler(msg, today_weather)
 
 
 @bot.message_handler(commands=['3daysweather'])
@@ -164,8 +190,19 @@ def weather(message):
 
     weather_logs(msg_logs, msg_date)
 
-    msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
-    bot.register_next_step_handler(msg, couple_days_weather, 3)
+    user_cities = get_user_cities(message.from_user.username)
+
+    if user_cities is None:
+        msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
+        bot.register_next_step_handler(msg, couple_days_weather, 3)
+    else:
+        cities = user_cities["cities"].split()
+        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        for city in cities:
+            markup.add(city)
+
+        msg = bot.send_message(message.chat.id, f'Оберіть Ваше місто або введіть його назву:', reply_markup=markup)
+        bot.register_next_step_handler(msg, couple_days_weather, 3)
 
 
 @bot.message_handler(commands=['weekweather'])
@@ -176,8 +213,19 @@ def weather(message):
 
     weather_logs(msg_logs, msg_date)
 
-    msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
-    bot.register_next_step_handler(msg, couple_days_weather, 7)
+    user_cities = get_user_cities(message.from_user.username)
+
+    if user_cities is None:
+        msg = bot.send_message(message.chat.id, f'Введіть назву міста:')
+        bot.register_next_step_handler(msg, couple_days_weather, 7)
+    else:
+        cities = user_cities["cities"].split()
+        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        for city in cities:
+            markup.add(city)
+
+        msg = bot.send_message(message.chat.id, f'Оберіть Ваше місто або введіть його назву:', reply_markup=markup)
+        bot.register_next_step_handler(msg, couple_days_weather, 7)
 
 
 bot.polling()
