@@ -151,7 +151,7 @@ def weather(message):
         bot.register_next_step_handler(msg, current_weather)
     else:
         cities = user_cities["cities"].split()
-        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
         for city in cities:
             markup.add(city)
 
@@ -174,7 +174,7 @@ def weather(message):
         bot.register_next_step_handler(msg, today_weather)
     else:
         cities = user_cities["cities"].split()
-        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
         for city in cities:
             markup.add(city)
 
@@ -197,7 +197,7 @@ def weather(message):
         bot.register_next_step_handler(msg, couple_days_weather, 3)
     else:
         cities = user_cities["cities"].split()
-        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
         for city in cities:
             markup.add(city)
 
@@ -220,7 +220,7 @@ def weather(message):
         bot.register_next_step_handler(msg, couple_days_weather, 7)
     else:
         cities = user_cities["cities"].split()
-        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
+        markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
         for city in cities:
             markup.add(city)
 
