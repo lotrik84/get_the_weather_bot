@@ -7,7 +7,7 @@ load_dotenv("./config/.env")
 MONGO_USER = os.getenv('MONGO_USER')
 MONGO_PASSWD = os.getenv('MONGO_PASSWD')
 
-client = pymongo.MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWD}@localhost:27017/")
+client = pymongo.MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWD}@mongodb:27017/")
 db = client["weather_users"]
 collection = db["users_cities"]
 
