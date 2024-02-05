@@ -23,7 +23,7 @@ def update_user_cities(user, city):
         collection.insert_one(item)
     else:
         cities = collection.find_one({"user": f"{user}"})
-        list_cities = cities["cities"].split()
+        list_cities = cities["cities"].split(", ")
         if city not in list_cities:
             if len(list_cities) >= 4:
                 list_cities.pop(0)
