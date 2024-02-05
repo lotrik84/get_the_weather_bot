@@ -4,8 +4,8 @@ import pymongo
 
 load_dotenv("./config/.env")
 
-MONGO_USER = os.getenv('MONGO_USER')
-MONGO_PASSWD = os.getenv('MONGO_PASSWD')
+MONGO_USER = os.getenv("MONGO_USER")
+MONGO_PASSWD = os.getenv("MONGO_PASSWD")
 
 client = pymongo.MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWD}@mongodb:27017/")
 db = client["weather_users"]
@@ -17,6 +17,7 @@ def get_user_cities(user):
 
 
 def update_user_cities(user, city):
+    city = city.capitalize()
     if collection.find_one({"user": f"{user}"}) is None:
         item = {"user": f"{user}", "cities": f"{city}"}
         collection.insert_one(item)
@@ -31,6 +32,6 @@ def update_user_cities(user, city):
                 list_cities.append(city)
 
             filter = {"user": f"{user}"}
-            cities = ' '.join(list_cities)
-            item = { "$set": {"cities": f"{cities}"}}
+            cities = ", ".join(list_cities)
+            item = {"$set": {"cities": f"{cities}"}}
             collection.update_one(filter, item)
