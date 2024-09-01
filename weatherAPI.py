@@ -5,7 +5,8 @@ import requests
 load_dotenv("./config/.env")
 
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
-api = "https://api.openweathermap.org/data/2.5"
+API_GEO_URL = "https://api.openweathermap.org/geo/1.0"
+API_WEATHER_URL = "https://api.openweathermap.org/data/2.5"
 
 
 def get_weather(city):
@@ -15,11 +16,11 @@ def get_weather(city):
         "units": "metric",
         "lang": "ua"
     }
-    response = requests.get(f"{api}/find", params=parameters)
+    response = requests.get(f"{API_GEO_URL}/direct", params=parameters)
     if response.status_code == 200:
         try:
-            lat = response.json()["list"][0]["coord"]["lat"]
-            lon = response.json()["list"][0]["coord"]["lon"]
+            lat = response.json()[0]["lat"]
+            lon = response.json()[0]["lon"]
             return get_full_weather(lat, lon)
         except:
             return False
@@ -35,7 +36,7 @@ def get_full_weather(lat, lon):
         "units": "metric",
         "lang": "ua"
     }
-    response = requests.get(f"{api}/onecall", params=parameters)
+    response = requests.get(f"{API_WEATHER_URL}/weather", params=parameters)
 
     if response.status_code == 200:
         return response.json()
